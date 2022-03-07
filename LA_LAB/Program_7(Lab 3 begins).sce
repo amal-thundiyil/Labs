@@ -1,0 +1,10 @@
+clc;
+A=eye(3,3);
+printf("Identity matrix is:");
+disp(A);
+printf("The determinant is:");
+disp(det(A));
+printf("The trace of A is");
+disp(trace(A));
+printf("The inverse of A is");
+disp(inv(A));

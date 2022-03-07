@@ -1,0 +1,11 @@
+clc;
+A=[12 22 32 68; 42 52 62 77; 11 21 31 84; 24 55 66 10];
+B=[14 25 36 15; 27 38 19 59; 16 35 44 87; 17 65 43 24];
+disp(A);
+disp(B);
+C=A+B;
+D=A*B;
+printf("The sum is");
+disp(C);
+printf("The product is");
+disp(D);
