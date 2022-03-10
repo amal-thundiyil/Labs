@@ -1,0 +1,23 @@
+Static library:
+    • Creation
+        a. Create a C file that contains functions in your library (Example: lib_mylib.c)
+        b. Create a header file for the library
+/* Filename: lib_mylib.h */
+void fun(void);
+        c. Compile library files: gcc -c lib_mylib.c -o lib_mylib.o
+        d. Create static library: ar rcs lib_mylib.a lib_mylib.o
+    • Usage
+        a. In the C file include the library (Example: #include "lib_mylib.h")
+        b. Compile the driver program (Example: gcc -c driver.c -o driver.o)
+        c. Link the compiled driver program to the static library: gcc -o driver driver.o -L. -l_mylib
+        d. Run the driver program
+
+Dynamic library:
+    • Creation
+        a. Compiling the library C file: gcc lib_mylib.c -c -fPIC -o lib_mylib.o
+        b. Create lib_mylib.h file, including the declarations of the functions
+        c. gcc -shared -o lib_mylib.so lib_mylib.o
+        d. export the path for libraries: export LD_LIBRARY_PATH=$PWD:$LD_LIBRARY_PATH
+    • Usage
+        a. In the driver program include : #include “lib_mylib.h”
+        b. Compile the driver program using the following command: gcc -L. -o driver driver.c -l_mylib. L. link the dynamic library to executable and . indicates it is present in the current directory
