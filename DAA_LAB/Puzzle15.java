@@ -32,42 +32,42 @@ public class Puzzle15 {
                 }
             }
         }
-        go(in, fin, 0, -1, x, y);
+        findSolution(in, fin, 0, -1, x, y);
         print(in);
 	}
 
-    static boolean go(int in[][], int fin[][], int depth, int restrict, int i, int j) {
+    static boolean findSolution(int in[][], int fin[][], int depth, int restrict, int i, int j) {
         PriorityQueue<int[]> q = new PriorityQueue<>((p1, p2) -> Integer.compare(p1[0], p2[0]));
         if(heuristicFunction(in, fin) == 0) {
             return true;
         }
         if(i - 1 >= 0 && restrict != 3) {
             swap(in, i, j, i-1, j);
-            int tmp[] = new int[]{heuristicFunction(in, fin)+depth, i-1, j, 0};
+            int tmp[] = new int[]{heuristicFunction(in, fin) + depth, i-1, j, 0};
             q.add(tmp);
             swap(in, i, j, i-1, j);
         }  
         if(j - 1 >= 0 && restrict != 2) {
             swap(in, i, j, i, j-1);
-            int tmp[] = new int[]{heuristicFunction(in, fin)+depth, i, j-1, 1};
+            int tmp[] = new int[]{heuristicFunction(in, fin) + depth, i, j-1, 1};
             q.add(tmp);
             swap(in, i, j, i, j-1);
         }
         if(i + 1 < n && restrict != 1) {
             swap(in, i, j, i+1, j);
-            int tmp[] = new int[]{heuristicFunction(in, fin)+depth, i+1, j, 2};
+            int tmp[] = new int[]{heuristicFunction(in, fin) + depth, i+1, j, 2};
             q.add(tmp);
             swap(in, i, j, i+1, j);
         }
         if(j + 1 < n && restrict != 0) {
             swap(in, i, j, i, j+1);
-            int tmp[] = new int[]{heuristicFunction(in, fin)+depth, i, j+1, 3};
+            int tmp[] = new int[]{heuristicFunction(in, fin) + depth, i, j+1, 3};
             q.add(tmp);
             swap(in, i, j, i, j+1);
         }
         for(int [] tmp: q) {
             swap(in, i, j, tmp[1], tmp[2]);
-            boolean ans = go(in, fin, depth+1, tmp[3], tmp[1], tmp[2]);
+            boolean ans = findSolution(in, fin, depth + 1, tmp[3], tmp[1], tmp[2]);
             if(ans) {
                 swap(in, i, j, tmp[1], tmp[2]);
                 pw.println("Cost:" + tmp[0]);
