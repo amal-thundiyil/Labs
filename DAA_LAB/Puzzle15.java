@@ -37,35 +37,34 @@ public class Puzzle15 {
 	}
 
     static boolean go(int in[][], int fin[][], int depth, int restrict, int i, int j) {
-        ArrayList<int[]> q = new ArrayList<int[]>();
-        if(h(in, fin) == 0) {
+        PriorityQueue<int[]> q = new PriorityQueue<>((p1, p2) -> Integer.compare(p1[0], p2[0]));
+        if(heuristicFunction(in, fin) == 0) {
             return true;
         }
         if(i - 1 >= 0 && restrict != 3) {
             swap(in, i, j, i-1, j);
-            int tmp[] = new int[]{h(in, fin)+depth, i-1, j, 0};
+            int tmp[] = new int[]{heuristicFunction(in, fin)+depth, i-1, j, 0};
             q.add(tmp);
             swap(in, i, j, i-1, j);
         }  
         if(j - 1 >= 0 && restrict != 2) {
             swap(in, i, j, i, j-1);
-            int tmp[] = new int[]{h(in, fin)+depth, i, j-1, 1};
+            int tmp[] = new int[]{heuristicFunction(in, fin)+depth, i, j-1, 1};
             q.add(tmp);
             swap(in, i, j, i, j-1);
         }
         if(i + 1 < n && restrict != 1) {
             swap(in, i, j, i+1, j);
-            int tmp[] = new int[]{h(in, fin)+depth, i+1, j, 2};
+            int tmp[] = new int[]{heuristicFunction(in, fin)+depth, i+1, j, 2};
             q.add(tmp);
             swap(in, i, j, i+1, j);
         }
         if(j + 1 < n && restrict != 0) {
             swap(in, i, j, i, j+1);
-            int tmp[] = new int[]{h(in, fin)+depth, i, j+1, 3};
+            int tmp[] = new int[]{heuristicFunction(in, fin)+depth, i, j+1, 3};
             q.add(tmp);
             swap(in, i, j, i, j+1);
         }
-        Collections.sort(q, (p1, p2) -> Integer.compare(p1[0], p2[0]));
         for(int [] tmp: q) {
             swap(in, i, j, tmp[1], tmp[2]);
             boolean ans = go(in, fin, depth+1, tmp[3], tmp[1], tmp[2]);
@@ -96,7 +95,7 @@ public class Puzzle15 {
         in[x][y] = temp;
     }
 
-    static int h(int in[][], int fin[][]) {
+    static int heuristicFunction(int in[][], int fin[][]) {
         int ans = 0;
         for(int i= 0 ; i < n ; i++) {
             for(int j = 0 ; j < n; j++) {
