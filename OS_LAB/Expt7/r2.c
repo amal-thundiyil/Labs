@@ -25,12 +25,7 @@ int buffer_print_index;
 sem_t *mutex_sem, *buffer_count_sem, *mutex_sem;
 
 int main(void) {
-    // if ((mutex_sem = sem_open(SEM_MUTEX_NAME, O_CREAT, 0660, 1)) == SEM_FAILED) {
-    //     perror("sem_open");
-    //     exit(1);
-    // }
-
-    key_t key = ftok("shared_file", 65);
+    key_t key = ftok("shmfile", 65);
     int input;
     int segment_id = shmget(key, (MAX_BUFFERS + 1) * sizeof(int), 0666 | IPC_CREAT);
     int* shared_memory = (int*)shmat(segment_id, NULL, 0);
@@ -38,23 +33,6 @@ int main(void) {
     for (int i = 0; i < MAX_BUFFERS; i++) {
         printf("%d ", *(shared_memory + i));
     }
-    // printf("Enter the state: \n");
-    // scanf("%s", input);
-    // sprintf(shared_memory, input);
     shmdt(shared_memory);
-
-    // int semval;
-    // while (1) {
-    //     if (sem_getvalue(mutex_sem, &semval) == -1)
-    //         perror("sem_getvalue");
-    //     if (!semval) break;
-    //     sleep(1);
-    // }
-
-    // if (sem_unlink("COUNT") == -1) {
-    //     perror("sem_unlink");
-    //     exit(1);
-    // }
-
     exit(0);
 }
