@@ -1,19 +1,12 @@
-clc;
-A=rand(3,3);
-B=rand(3,3);
-printf("The first random matrix is");
-disp(A);
-printf("The second random matrix is");
-disp(B);
-printf("The sum of two matrices is");
-disp(A+B);
-printf("The product of two matrices is");
-disp(A*B);
-printf("Upper triangular matrix of matrix A is");
-disp(triu(A));
-printf("Lower triangular matrix of matrix A is");
-disp(tril(A));
-printf("Upper triangular matrix of matrix B is");
-disp(triu(B));
-printf("Lower triangular matrix of matrix B is");
-disp(tril(B));
+clc
+printf("Amal Thundiyil - 2020400066 SE IT - D\n")
+A = rand(4,4)
+B = rand(4,4)
+printf("The first random matrix is")
+disp(A)
+printf("The second random matrix is")
+disp(B)
+printf("The product of two matrices is")
+disp(A*B)
+printf("The sum of two matrices is")
+disp(A+B)
