@@ -9,16 +9,16 @@
 #include <unistd.h>
 #define SHMSZ 27
 
-void insertion_sort(int arr[], int n) {
+void bubble_sort(int arr[], int n) {
     int i, j;
-    for (int i = 0; i < n; i++) {
-        int key = arr[i];
-        int j = i - 1;
-        while (arr[j] >= key && j >= 0) {
-            arr[j + 1] = arr[j];
-            j = j - 1;
+    for (i = 0; i < n - 1; i++) {
+        for (j = 0; j < n - i - 1; j++) {
+            if (arr[j] > arr[j + 1]) {
+                int temp = arr[j];
+                arr[j] = arr[j + 1];
+                arr[j + 1] = temp;
+            }
         }
-        arr[j + 1] = key;
     }
 }
 int main() {
@@ -42,8 +42,8 @@ int main() {
         } else
             c++;
     }
-    insertion_sort(sh, c);
-    printf("Final sorted data: \n");
+    bubble_sort(sh, c);
+    printf("Final sorted array: ");
     for (int i = 0; i < c; i++)
         printf("%d ", sh[i]);
     printf("\n");
@@ -51,6 +51,6 @@ int main() {
     for (int i = 0; i < 40; i++) {
         ans += sh[i];
     }
-    printf("Sum: %d", ans);
+    printf("Sum of the array is: %d", ans);
     sem_close(r);
 }
