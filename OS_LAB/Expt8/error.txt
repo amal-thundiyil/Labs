@@ -1,3 +1,0 @@
-Exception in thread "main" java.lang.NullPointerException
-	at Main.calcNeed(Main.java:51)
-	at Main.main(Main.java:97)
