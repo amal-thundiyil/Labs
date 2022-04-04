@@ -1,11 +1,6 @@
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.ReentrantLock;
-import static java.lang.Math.*;
 import static java.lang.System.out;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.util.*;
 
 public class Main {
@@ -15,7 +10,7 @@ public class Main {
     static HashSet<Integer> safeSet = new HashSet<>();
     static boolean safe = true;
     static int[] available, work, request;
-    static int requestingThread;
+    static int requestingThread, threads, products;
     static volatile ReentrantLock rl;
 
     static class ProcessExecution implements Runnable {
@@ -30,7 +25,6 @@ public class Main {
             rl.lock();
             try {
                 out.println("Acquired the lock: " + t_no);
-                out.println("I am running");
                 try {
                     Thread.sleep(1000);
                 } catch (Exception e) {
@@ -72,12 +66,12 @@ public class Main {
         for (int i = 0; i < need.length; i++) {
             int threadNo = findThreadWithMinNeed();
             if (threadNo == -1) {
-                System.out.println("No safe sequence found!!");
+                System.out.println("No safe sequence found!");
                 safe = false;
                 return;
             }
-            for (int j = 0; j < need[i].length; j++) {
-                work[j] += need[threadNo][j];
+            for (int j = 0; j < allocation[i].length; j++) {
+                work[j] += allocation[threadNo][j];
             }
         }
     }
@@ -91,30 +85,21 @@ public class Main {
         }
     }
 
-    public static void warnNotSafe() {
+    public static boolean grantRequest() {
         if (!safe) {
-            System.out.println("Request couldn't be granted.");
+            return false;
         }
-    }
-
-    public static void grantRequest() {
-        warnNotSafe();
         for (int i = 0; i < available.length; i++) {
-            if (request[i] > available[i]) {
-                warnNotSafe();
-                return;
+            if (request[i] > available[i]
+                    || request[i] > need[requestingThread][i]) {
+                return false;
             }
         }
-        for (int i = 0; i < allocation[0].length; i++) {
-            if (request[i] > allocation[requestingThread][i]) {
-                warnNotSafe();
-                break;
-            }
-        }
-        System.out.println("Request can't be granted immediately. Please wait.");
+        return true;
     }
 
     public static void display() {
+        System.out.println("");
         System.out.println("Available: " + Arrays.toString(available));
 
         System.out.println("Allocation\tMax\t\tNeed");
@@ -132,14 +117,37 @@ public class Main {
             }
             System.out.println("");
         }
-        System.out.println("Safe Sequence: " + safeSequence.toString());
-        System.out.println("Request: " + Arrays.toString(request));
+        if (safe) {
+            System.out.println("Safe Sequence: " + safeSequence.toString());
+        }
     }
 
-    public static void main(String args[]) throws FileNotFoundException {
+    public static void banker() throws Exception {
+        safeSequence.clear();
+        safeSet.clear();
+        calcNeed();
+        calcSafeSequence();
+        display();
+
+        Thread th[] = new Thread[threads];
+        ProcessExecution processes[] = new ProcessExecution[threads];
+        work = Arrays.copyOf(available, products);
+        if (!safe) {
+            return;
+        }
+        for (int i = 0; i < threads; i++) {
+            processes[i] = new ProcessExecution(safeSequence.get(i));
+            th[i] = new Thread(processes[i]);
+            th[i].setPriority(i + 1);
+            th[i].start();
+            th[i].join();
+        }
+    }
+
+    public static void main(String args[]) throws Exception {
         System.setIn(new FileInputStream("./input.txt"));
         fs = new Scanner(System.in);
-        int threads, products;
+        rl = new ReentrantLock();
 
         threads = fs.nextInt();
         products = fs.nextInt();
@@ -160,28 +168,27 @@ public class Main {
         for (int i = 0; i < products; i++) {
             available[i] = fs.nextInt();
         }
-        calcNeed();
-        calcSafeSequence();
-        display();
-
-        Thread th[] = new Thread[threads];
-        ProcessExecution pr[] = new ProcessExecution[threads];
-        for (int i = 0; i < safeSequence.size(); i++) {
-            int num = safeSequence.get(i);
-            pr[num] = new ProcessExecution(num);
+        banker();
+        System.out.println("");
+        request = new int[products];
+        for (int i = 0; i < products; i++) {
+            request[i] = fs.nextInt();
         }
-        int ch = 1;
-        while (ch != 0) {
-            request = new int[products];
+        requestingThread = fs.nextInt();
+        System.out.println("Request of thread " + requestingThread + " is " + Arrays.toString(request));
+        boolean grant = grantRequest();
+        if (!grant) {
+            System.out.println("Request cannot be granted.");
+        } else {
+            System.out.println("Request granted ...");
             for (int i = 0; i < products; i++) {
-                request[i] = fs.nextInt();
+                allocation[requestingThread][i] += request[i];
             }
-            requestingThread = fs.nextInt();
-            System.out.println("Press 0 to exit: ");
-            ch = fs.nextInt();
+            for (int i = 0; i < products; i++) {
+                available[i] -= request[i];
+            }
+            banker();
         }
-
-        grantRequest();
         fs.close();
     }
 }
