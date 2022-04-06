@@ -4,55 +4,71 @@ import java.io.FileInputStream;
 public class Main {
     static Scanner fs;
     static int ub;
-    static List<Integer> ans;
+    static List<Node> ans;
+    static int N, M;
 
     static class Node {
-        int u, c, index;
+        int u, c, level, taken;
 
-        Node(int u, int c, int index) {
+        Node(int u, int c, int index, int taken) {
             this.u = u;
             this.c = c;
-            this.index = index;
+            this.level = index;
+            this.taken = taken;
         }
     }
 
-    public static void bb(PriorityQueue<Node> nodes, int w, int M, int N, int profit[], int weight[]) {
+    public static void bb(PriorityQueue<Node> nodes, int w, int profit[], int weight[]) {
         while (!nodes.isEmpty()) {
             Node node = nodes.poll();
-            if (node.index == N) {
+            if (node.level >= N) {
                 return;
             } else if (w > M || node.c > ub) {
-                w -= weight[node.index];
-                ans.set(ans.size() - 1, 0);
+                ans.remove(node);
+                w -= weight[node.level];
                 continue;
             }
-            
-            ub = Math.min(node.u, ub);
-            int u = node.u - profit[node.index];
-            int c = node.c - profit[node.index];
-            ans.add(1);
-            if (w + weight[node.index] > M) {
-                c = node.c - ((profit[node.index] / weight[node.index]) * (M - w));
-            }
-            w += weight[node.index];
+            ans.add(node);
             System.out.println("u = " + node.u + ", c = " + node.c + ", ub = " + ub);
-            nodes.add(new Node(u, c, node.index + 1));
-            nodes.add(new Node(node.u, node.c, node.index + 1));
+            ub = Math.min(node.u, ub);
+            int u = node.u + profit[node.level];
+            int c = node.c + profit[node.level];
+            if (w + weight[node.level] > M) {
+                c = node.c + ((profit[node.level] / weight[node.level]) * (M - w));
+            }
+            w += weight[node.level];
+            nodes.add(new Node(u, c, node.level + 1, 1));
+            nodes.add(new Node(node.u, node.c, node.level + 1, 1));
         }
+    }
+
+    public static void solve(int[] profit, int[] weight) {
+        int u = 0, c = 0, w = 0;
+        ub = Integer.MAX_VALUE;
+        for (int i = 0; i < N; i++) {
+            if (w + weight[i] > M) {
+                c -= ((profit[i] / weight[i]) * (M - w));
+                break;
+            }
+            w += weight[i];
+            u -= profit[i];
+            c -= profit[i];
+        }
+        ub = Math.min(u, ub);
+        Node node = new Node(u, c, 0, 0);
+        PriorityQueue<Node> q = new PriorityQueue<>((Node a, Node b) -> (b.c - a.c));
+        q.add(node);
+        bb(q, w, profit, weight);
     }
 
     public static void main(String[] args) throws Exception {
         System.setIn(new FileInputStream("./input.txt"));
         fs = new Scanner(System.in);
-        int N = fs.nextInt();
-        int M = fs.nextInt();
+        N = fs.nextInt();
+        M = fs.nextInt();
         ans = new ArrayList<>();
-        ub = Integer.MAX_VALUE;
-        Node node = new Node(0, 0, 0);
         int profit[] = new int[N];
         int weight[] = new int[N];
-        PriorityQueue<Node> q = new PriorityQueue<>((Node a, Node b) -> (a.c - b.c));
-        q.add(node);
 
         for (int i = 0; i < N; i++) {
             profit[i] = fs.nextInt();
@@ -60,7 +76,9 @@ public class Main {
         for (int i = 0; i < N; i++) {
             weight[i] = fs.nextInt();
         }
-        bb(q, 0, M, N, profit, weight);
-        System.out.println(ans.toString());
+        solve(profit, weight);
+        for (Node node : ans) {
+            System.out.print(node.taken + " ");
+        }
     }
 }
