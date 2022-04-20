@@ -1,0 +1,2 @@
+ Amal has acquired the lock. This is sample text.
+ Amal has acquired the lock now.
